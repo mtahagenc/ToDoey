@@ -12,9 +12,13 @@ class TodoListViewController: UITableViewController {
     
 
     var itemArray = [Item]()
-    var defaults = UserDefaults.standard
+    
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
     override func viewDidLoad() {
+
+        
+        print(dataFilePath!)
         
         let newItem = Item()
         newItem.title = "Find Mike"
@@ -29,9 +33,9 @@ class TodoListViewController: UITableViewController {
         itemArray.append(newItem3)
         
         
-        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
-            itemArray = items
-        }
+//        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
+//            itemArray = items
+//        }
         
         super.viewDidLoad()
         
@@ -105,11 +109,13 @@ class TodoListViewController: UITableViewController {
                 givenItem.title = textField.text!
                 
                 self.itemArray.append(givenItem)
+                
             }
             
-            self.defaults.set(self.itemArray, forKey: "TodoListArray")
             
-            self.tableView.reloadData()
+            self.saveItems()
+
+            
             
         }
         
@@ -125,7 +131,25 @@ class TodoListViewController: UITableViewController {
         
     }
     
+    //Mark - Model Manuppulation Methods
+    
+    func saveItems () {
+        
+        let encoder = PropertyListEncoder()
+        
+        do {
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilePath!)
+        } catch {
+            print("Error encoding itemArray, \(error)")
+        }
+        
+        tableView.reloadData()
+        
+    }
 
+    
+    
 }
 
 
